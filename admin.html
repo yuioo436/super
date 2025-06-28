@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SuperMovie Admin Panel</title>
+  <style>
+    body { background:#111; color:#fff; font-family:'Segoe UI',sans-serif; padding:20px; margin:0; }
+    h1 { text-align:center; color:#03dac5; }
+    form { max-width:500px; margin:auto; display:flex; flex-direction:column; gap:15px; margin-top:30px; }
+    input, textarea { padding:12px; border:none; border-radius:8px; background:#1e1e1e; color:#fff; }
+    button { padding:12px; background:#03dac5; border:none; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; }
+    button:hover { background:#00bfa5; }
+    footer { text-align:center; color:#888; font-size:14px; margin-top:40px; }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+</head>
+<body>
+  <h1>🎬 SuperMovie Admin Panel</h1>
+  <form id="movieForm">
+    <input id="title" placeholder="Movie Title" required/>
+    <input id="poster" placeholder="Poster Image URL" required/>
+    <input id="url" placeholder="Movie Download URL" required/>
+    <input id="category" placeholder="Category (e.g. Action)" required/>
+    <textarea id="description" placeholder="Description (optional)"></textarea>
+    <button type="submit">Upload Movie</button>
+  </form>
+  <footer>🚀 Made by <strong>Aman</strong></footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAk2lv6TfKIiptdEKooSU0NmEde94R2EHM",
+      authDomain: "uttt-f1f02.firebaseapp.com",
+      databaseURL: "https://uttt-f1f02-default-rtdb.firebaseio.com",
+      projectId: "uttt-f1f02",
+      storageBucket: "uttt-f1f02.appspot.com",
+      messagingSenderId: "243007886313",
+      appId: "1:243007886313:web:d4cf31cbf44faa0c207178",
+      measurementId: "G-D4GDK6NXZ1"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    document.getElementById("movieForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const movie = {
+        title: document.getElementById("title").value,
+        poster: document.getElementById("poster").value,
+        url: document.getElementById("url").value,
+        category: document.getElementById("category").value,
+        description: document.getElementById("description").value
+      };
+      db.ref("movies").push(movie)
+        .then(() => { alert("✅ Uploaded!"); e.target.reset(); })
+        .catch(err => { console.error(err); alert("❌ Error"); });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SuperMovie - Download Movies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin:0; padding:20px; }
+    h1 { text-align:center; color:#03dac5; margin-bottom:30px; }
+    .controls { max-width:500px; margin:auto; display:flex; gap:10px; flex-direction:column; }
+    input, select { padding:12px; border:none; border-radius:8px; background:#1e1e1e; color:#fff; font-size:16px; }
+    #loader { text-align:center; color:#03dac5; margin:30px 0; animation:blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.5;} }
+    #movieList { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
+    .movie-card { background:#1e1e1e; border-radius:12px; padding:15px; box-shadow:0 4px 10px rgba(0,0,0,0.4); transition:transform .2s; }
+    .movie-card:hover { transform:scale(1.02); }
+    .movie-card img { width:100%; border-radius:8px; margin-bottom:10px; }
+    .movie-card h3 { margin:5px 0; color:#fff; }
+    .movie-card p { font-size:14px; color:#b0b0b0; }
+    .movie-card button { background:#03dac5; color:#000; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold; }
+    .movie-card button:hover { background:#00bfa5; }
+    footer { text-align:center; padding:15px; margin-top:40px; color:#888; font-size:15px; border-top:1px solid #222; }
+  </style>
+</head>
+<body>
+  <h1>🎬 SuperMovie</h1>
+  <div class="controls">
+    <input id="searchInput" placeholder="🔍 Search movies..." oninput="filterMovies()">
+    <select id="categoryFilter" onchange="filterMovies()">
+      <option value="">All Categories</option>
+      <option>Action</option>
+      <option>Comedy</option>
+      <option>Horror</option>
+      <option>Drama</option>
+    </select>
+  </div>
+  <div id="loader">⏳ Loading movies...</div>
+  <div id="movieList"></div>
+  <footer>🚀 Made by <strong>Aman</strong></footer>
+
+  <script>
+    const db = firebase.database();
+    const movieList = document.getElementById("movieList");
+    const loader = document.getElementById("loader");
+    let allMovies = [];
+    loader.style.display = "block";
+    db.ref("movies").on("value", snapshot => {
+      allMovies = [];
+      snapshot.forEach(child => allMovies.push(child.val()));
+      loader.style.display = "none";
+      filterMovies();
+    });
+    function filterMovies() {
+      const s = document.getElementById("searchInput").value.toLowerCase();
+      const c = document.getElementById("categoryFilter").value;
+      movieList.innerHTML = "";
+      allMovies.forEach(data => {
+        if ((!s || data.title.toLowerCase().includes(s)) &&
+            (!c || data.category === c)) {
+          movieList.innerHTML += `
+            <div class="movie-card">
+              <img src="\${data.poster}" alt="\${data.title}">
+              <h3>\${data.title}</h3>
+              <p><strong>Category:</strong> \${data.category||'Uncategorized'}</p>
+              <p>\${data.description||''}</p>
+              <button onclick="window.open('\${data.url}', '_blank')">⬇️ Download</button>
+            </div>
+          `;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
